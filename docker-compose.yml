@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+    container_name: fastapi_app
+    env_file:
+      - .env
+    ports:
+      - 9999:8000
+    depends_on:
+      - db
+      - minio
+
+  db:
+    image: postgres:15
+    container_name: db_app
+    command: -p 5435
+    expose:
+      - 5435
+
+  minio:
+    image: minio/minio
+    container_name: minio_app
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+    command: server --console-address ":9001" /data
